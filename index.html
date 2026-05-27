@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator PPh 21 - Tarif Progresif UU HPP</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen py-10 px-4">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <div class="bg-gradient-to-r py-6 px-8 text-white text-center bg-slate-800">
+            <h1 class="text-2xl font-bold tracking-wide">PERHITUNGAN PAJAK PENGHASILAN (PPh) PASAL 21</h1>
+            <p class="text-sm opacity-90 mt-1">Berdasarkan UU HPP No. 7 Tahun 2021 | Tarif Progresif Otomatis</p>
+        </div>
+
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
+                        <span class="bg-slate-800 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">A</span>
+                        DATA PENGHASILAN
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Penghasilan Bruto (Setahun) <span class="text-red-500">*</span></label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">Rp</span>
+                                </div>
+                                <input type="number" id="bruto" value="0" min="0" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-amber-50 font-semibold" oninput="hitungPajak()">
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">■ Input manual wajib diisi</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Biaya Jabatan (5%)</label>
+                                <input type="text" id="biayaJabatan" value="Rp 0" class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-right font-medium text-gray-600" disabled>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Maks. Rp6.000.000/th</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iuran Pensiun / BPJS</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 text-xs">Rp</span>
+                                    </div>
+                                    <input type="number" id="iuranPensiun" value="0" min="0" class="w-full pl-8 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-amber-50" oninput="hitungPajak()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-dashed">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Penghasilan Neto (Setahun)</label>
+                            <input type="text" id="neto" value="Rp 0" class="w-full px-3 py-2 border border-blue-200 bg-blue-50/50 rounded-lg text-right font-bold text-blue-700" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
+                        <span class="bg-slate-800 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">B</span>
+                        PENGHASILAN TIDAK KENA PAJAK (PTKP)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status PTKP <span class="text-red-500">*</span></label>
+                            <select id="statusPtkp" class="w-full px-3 py-2 border border-gray-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold" onchange="hitungPajak()">
+                                <option value="54000000">TK/0 (Rp54.000.000)</option>
+                                <option value="58500000">TK/1 (Rp58.500.000)</option>
+                                <option value="63000000">TK/2 (Rp63.000.000)</option>
+                                <option value="67500000">TK/3 (Rp67.500.000)</option>
+                                <option value="58500000">K/0 (Rp58.500.000)</option>
+                                <option value="63000000">K/1 (Rp63.000.000)</option>
+                                <option value="67500000">K/2 (Rp67.500.000)</option>
+                                <option value="72000000">K/3 (Rp72.000.000)</option>
+                                <option value="112500000">K/I/0 (Rp112.500.000)</option>
+                                <option value="117000000">K/I/1 (Rp117.000.000)</option>
+                                <option value="121500000">K/I/2 (Rp121.500.000)</option>
+                                <option value="126000000">K/I/3 (Rp126.000.000)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Nilai PTKP</label>
+                            <input type="text" id="nilaiPtkp" value="Rp 54.000.000" class="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-right font-semibold text-gray-600" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
+                        <span class="bg-slate-800 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">C</span>
+                        PENGHASILAN KENA PAJAK (PKP)
+                    </h2>
+                    <div>
+                        <input type="text" id="pkp" value="Rp 0" class="w-full px-4 py-3 border-2 border-emerald-300 bg-emerald-50 rounded-xl text-right text-xl font-bold text-emerald-700" disabled>
+                        <p class="text-xs text-gray-400 mt-1">Formulasi: Neto - PTKP (Batas minimum 0)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
+                        <span class="bg-slate-800 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">D</span>
+                        PERHITUNGAN TARIF PROGRESIF
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left text-gray-500">
+                            <thead class="text-[11px] text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th class="py-2 px-2">Lapisan / Tarif</th>
+                                    <th class="py-2 px-2 text-right">DPP (Dasar Pengenaan)</th>
+                                    <th class="py-2 px-2 text-right">Pajak Terutang</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 font-medium">
+                                <tr>
+                                    <td class="py-2.5 px-2">Lapisan I (5%)<br><span class="text-[10px] text-gray-400">0 - 60 Jt</span></td>
+                                    <td id="dpp1" class="py-2.5 px-2 text-right text-gray-600">Rp 0</td>
+                                    <td id="pajak1" class="py-2.5 px-2 text-right text-slate-900 font-semibold">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-2">Lapisan II (15%)<br><span class="text-[10px] text-gray-400">>60 Jt - 250 Jt</span></td>
+                                    <td id="dpp2" class="py-2.5 px-2 text-right text-gray-600">Rp 0</td>
+                                    <td id="pajak2" class="py-2.5 px-2 text-right text-slate-900 font-semibold">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-2">Lapisan III (25%)<br><span class="text-[10px] text-gray-400">>250 Jt - 500 Jt</span></td>
+                                    <td id="dpp3" class="py-2.5 px-2 text-right text-gray-600">Rp 0</td>
+                                    <td id="pajak3" class="py-2.5 px-2 text-right text-slate-900 font-semibold">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-2">Lapisan IV (30%)<br><span class="text-[10px] text-gray-400">>500 Jt - 5 Milyar</span></td>
+                                    <td id="dpp4" class="py-2.5 px-2 text-right text-gray-600">Rp 0</td>
+                                    <td id="pajak4" class="py-2.5 px-2 text-right text-slate-900 font-semibold">Rp 0</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-2">Lapisan V (35%)<br><span class="text-[10px] text-gray-400">>5 Milyar</span></td>
+                                    <td id="dpp5" class="py-2.5 px-2 text-right text-gray-600">Rp 0</td>
+                                    <td id="pajak5" class="py-2.5 px-2 text-right text-slate-900 font-semibold">Rp 0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white rounded-xl p-6 space-y-4 shadow-inner mt-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <span class="text-xs uppercase tracking-wider text-slate-400">Pajak PPh 21 / Tahun</span>
+                        <span id="totalPajakSetahun" class="text-2xl font-black text-amber-400">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs uppercase tracking-wider text-slate-400">Pajak PPh 21 / Bulan (÷12)</span>
+                        <span id="pajakPerBulan" class="text-xl font-bold text-emerald-400">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Formatter Mata Uang Rupiah Indonesia
+        const formatRupiah = (angka) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        };
+
+        function hitungPajak() {
+            // 1. Ambil nilai input
+            const bruto = parseFloat(document.getElementById('bruto').value) || 0;
+            const iuranPensiun = parseFloat(document.getElementById('iuranPensiun').value) || 0;
+            const nilaiPtkp = parseFloat(document.getElementById('statusPtkp').value) || 0;
+
+            // Update Tampilan Nilai PTKP Terpilih
+            document.getElementById('nilaiPtkp').value = formatRupiah(nilaiPtkp);
+
+            // 2. Hitung Biaya Jabatan (5%, maks Rp 6.000.000 setahun)
+            let biayaJabatan = bruto * 0.05;
+            if (biayaJabatan > 6000000) {
+                biayaJabatan = 6000000;
+            }
+            document.getElementById('biayaJabatan').value = formatRupiah(biayaJabatan);
+
+            // 3. Hitung Penghasilan Neto Setahun
+            let neto = bruto - biayaJabatan - iuranPensiun;
+            if (neto < 0) neto = 0;
+            document.getElementById('neto').value = formatRupiah(neto);
+
+            // 4. Hitung Penghasilan Kena Pajak (PKP)
+            let pkp = neto - nilaiPtkp;
+            if (pkp < 0) pkp = 0;
+            document.getElementById('pkp').value = formatRupiah(pkp);
+
+            // 5. Rumus Tarif Progresif Berlapis (UU HPP)
+            let sisaPkp = pkp;
+            let dpp = [0, 0, 0, 0, 0];
+            let pajak = [0, 0, 0, 0, 0];
+            const tarif = [0.05, 0.15, 0.25, 0.30, 0.35];
+
+            // Batas Lapisan
+            const batas = [60000000, 190000000, 250000000, 4500000000]; // Interval masing-masing tier
+
+            // Lapisan 1 (0 - 60jt)
+            if (sisaPkp > 0) {
+                dpp[0] = Math.min(sisaPkp, batas[0]);
+                pajak[0] = dpp[0] * tarif[0];
+                sisaPkp -= dpp[0];
+            }
+            // Lapisan 2 (>60jt - 250jt)
+            if (sisaPkp > 0) {
+                dpp[1] = Math.min(sisaPkp, batas[1]);
+                pajak[1] = dpp[1] * tarif[1];
+                sisaPkp -= dpp[1];
+            }
+            // Lapisan 3 (>250jt - 500jt)
+            if (sisaPkp > 0) {
+                dpp[2] = Math.min(sisaPkp, batas[2]);
+                pajak[2] = dpp[2] * tarif[2];
+                sisaPkp -= dpp[2];
+            }
+            // Lapisan 4 (>500jt - 5M)
+            if (sisaPkp > 0) {
+                dpp[3] = Math.min(sisaPkp, batas[3]);
+                pajak[3] = dpp[3] * tarif[3];
+                sisaPkp -= dpp[3];
+            }
+            // Lapisan 5 (>5M)
+            if (sisaPkp > 0) {
+                dpp[4] = sisaPkp;
+                pajak[4] = dpp[4] * tarif[4];
+            }
+
+            // 6. Update Hasil ke Tabel HTML
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`dpp${i+1}`).innerText = formatRupiah(dpp[i]);
+                document.getElementById(`pajak${i+1}`).innerText = formatRupiah(pajak[i]);
+            }
+
+            // 7. Hitung Total Pajak Setahun & Sebulan
+            const totalPajakSetahun = pajak.reduce((a, b) => a + b, 0);
+            const pajakPerBulan = totalPajakSetahun / 12;
+
+            document.getElementById('totalPajakSetahun').innerText = formatRupiah(totalPajakSetahun);
+            document.getElementById('pajakPerBulan').innerText = formatRupiah(pajakPerBulan);
+        }
+
+        // Jalankan fungsi hitung pertama kali saat halaman dimuat
+        hitungPajak();
+    </script>
+</body>
+</html>

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator PPh 21 - Tarif Progresif & TER Bulanan</title>
-    <!-- Tailwind CSS untuk Desain Modern & Responsif -->
+    <title>Kalkulator PPh 21 - Komparasi TER & Progresif (with Bonus/THR)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -13,7 +12,6 @@
 <body class="bg-gray-50 text-gray-800 min-h-screen py-10 px-4">
 
     <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <!-- Header -->
         <div class="bg-gradient-to-r py-6 px-8 text-white text-center bg-slate-800">
             <h1 class="text-2xl font-bold tracking-wide">KALKULATOR PAJAK PENGHASILAN (PPh) PASAL 21</h1>
             <p class="text-sm opacity-90 mt-1">Simulasi Komparasi Tarif Progresif (Pasal 17) & Tarif Efektif Rata-Rata (TER) Bulanan</p>
@@ -21,7 +19,6 @@
 
         <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- KOLOM 1: INPUT DATA UTAMA -->
             <div class="space-y-6 lg:border-r lg:pr-6 border-gray-200">
                 <div>
                     <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
@@ -63,10 +60,20 @@
                                 <input type="text" id="iuranPensiunInput" value="100.000" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-amber-50 text-sm" oninput="formatDanHitung(this)">
                             </div>
                         </div>
+
+                        <div class="pt-2 border-t border-gray-100">
+                            <label class="block text-sm font-medium text-blue-900 mb-1">Bonus / THR / Kinerja (Setahun)</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-blue-500 text-sm font-bold">Rp</span>
+                                </div>
+                                <input type="text" id="bonusThrInput" value="0" class="w-full pl-10 pr-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-blue-50/50 font-bold text-sm text-blue-950" placeholder="Isi nominal bonus jika ada" oninput="formatDanHitung(this)">
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">※ Hanya menambah komponen bruto progresif akhir tahun.</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Hasil Komparatif Singkat -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-2">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Info Ringkas Parameter</h3>
                     <div class="flex justify-between text-xs font-medium text-gray-600">
@@ -80,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- KOLOM 2: DETAIL METODE TER BULANAN (JAN-NOV) -->
             <div class="space-y-6 lg:border-r lg:px-6 border-gray-200">
                 <div>
                     <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
@@ -106,7 +112,6 @@
                 </div>
             </div>
 
-            <!-- KOLOM 3: DETAIL METODE PROGRESIF (PASAL 17) -->
             <div class="space-y-6 lg:pl-6">
                 <div>
                     <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
@@ -116,15 +121,27 @@
                     
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-gray-500">
-                            <span>Bruto Disetahunkan:</span>
+                            <span>Gaji Pokok Disetahunkan (12x):</span>
+                            <span id="gajiSetahun">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-blue-600">
+                            <span>(+) Bonus / THR (Setahun):</span>
+                            <span id="bonusThrSetahun">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 py-1.5 font-bold text-slate-700 bg-gray-50 px-1 rounded">
+                            <span>Total Bruto Kumulatif:</span>
                             <span id="brutoSetahun">Rp 0</span>
                         </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-gray-500">
-                            <span>Biaya Jabatan (Maks 6Jt):</span>
-                            <span id="biayaJabatanSetahun">Rp 0</span>
+                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
+                            <span>(-) Biaya Jabatan (5%, maks 6jt):</span>
+                            <span id="biayaJabatanSetahun">-Rp 0</span>
                         </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-gray-500">
-                            <span>Neto Disetahunkan:</span>
+                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
+                            <span>(-) Iuran Pensiun / BPJS (Setahun):</span>
+                            <span id="iuranPensiunSetahun">-Rp 0</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 py-1.5 font-bold text-slate-700 bg-gray-50 px-1 rounded">
+                            <span>Penghasilan Neto Setahun:</span>
                             <span id="netoSetahun">Rp 0</span>
                         </div>
                         <div class="flex justify-between border-b border-gray-100 py-2 font-bold text-emerald-700 bg-emerald-50 px-2 rounded">
@@ -136,8 +153,7 @@
                     <div class="mt-4">
                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Lapisan Pajak Pasal 17:</h4>
                         <div id="containerLapisanProgresif" class="space-y-1 text-[11px] font-medium text-gray-600 max-h-[140px] overflow-y-auto">
-                            <!-- Diisi via JavaScript -->
-                        </div>
+                            </div>
                     </div>
 
                     <div class="flex justify-between items-center border-t border-gray-200 pt-3 mt-3">
@@ -149,7 +165,6 @@
 
         </div>
 
-        <!-- PANEL BAWAH: KESIMPULAN REKONSILIASI AKHIR (BULAN DESEMBER) -->
         <div class="bg-slate-900 text-white p-6 border-t border-slate-700">
             <h2 class="text-lg font-bold tracking-wide flex items-center gap-2 mb-4 text-amber-400">
                 👑 REKONSILIASI & KESIMPULAN MASA DESEMBER
@@ -177,7 +192,6 @@
         </div>
     </div>
 
-    <!-- DATA TABEL TARIF TER (PP 58/2023) -->
     <script>
         const TER_MAPPING = {
             'A': [
@@ -244,14 +258,12 @@
             return parseFloat(rawVal.replace(/\./g, '')) || 0;
         }
 
-        // Fungsi manipulasi input agar ada pemisah titik secara langsung saat mengetik
+        // Fungsi penata otomatis titik ribuan saat mengetik
         function formatDanHitung(inputNode) {
             let value = inputNode.value.replace(/\D/g, ""); // ambil angka saja
             if (value === "") value = "0";
             
-            // Format ulang dengan titik lokal Indonesia
             inputNode.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
-            
             hitungSemuaPajak();
         }
 
@@ -273,6 +285,7 @@
             
             const brutoBulanan = getCleanNumber('brutoBulanInput');
             const iuranPensiunBulanan = getCleanNumber('iuranPensiunInput');
+            const bonusThrTahunan = getCleanNumber('bonusThrInput');
 
             // Tampilkan info ringkas parameter
             document.getElementById('labelNilaiPtkp').innerText = formatRupiah(nilaiPtkp);
@@ -292,11 +305,12 @@
             // ==========================================
             // LOGIKA 2: PERHITUNGAN PROGRESIF PASAL 17 (TAHUNAN)
             // ==========================================
-            const brutoTahunan = brutoBulanan * 12;
+            const gajiDisetahunkan = brutoBulanan * 12;
+            const brutoTahunan = gajiDisetahunkan + bonusThrTahunan; // Menambahkan komponen Bonus/THR ke Bruto Setahun
             const iuranPensiunTahunan = iuranPensiunBulanan * 12;
             
             let biayaJabatanTahunan = brutoTahunan * 0.05;
-            if (biayaJabatanTahunan > 6000000) biayaJabatanTahunan = 6000000; // Cap batas biaya jabatan
+            if (biayaJabatanTahunan > 6000000) biayaJabatanTahunan = 6000000; // Cap batas biaya jabatan 6jt/tahun
 
             let netoTahunan = brutoTahunan - biayaJabatanTahunan - iuranPensiunTahunan;
             if (netoTahunan < 0) netoTahunan = 0;
@@ -304,8 +318,12 @@
             let pkp = netoTahunan - nilaiPtkp;
             if (pkp < 0) pkp = 0;
 
+            // Render komponen ke UI progresif secara transparan
+            document.getElementById('gajiSetahun').innerText = formatRupiah(gajiDisetahunkan);
+            document.getElementById('bonusThrSetahun').innerText = formatRupiah(bonusThrTahunan);
             document.getElementById('brutoSetahun').innerText = formatRupiah(brutoTahunan);
-            document.getElementById('biayaJabatanSetahun').innerText = formatRupiah(biayaJabatanTahunan);
+            document.getElementById('biayaJabatanSetahun').innerText = `-${formatRupiah(biayaJabatanTahunan)}`;
+            document.getElementById('iuranPensiunSetahun').innerText = `-${formatRupiah(iuranPensiunTahunan)}`; // Menampilkan pengurang iuran
             document.getElementById('netoSetahun').innerText = formatRupiah(netoTahunan);
             document.getElementById('pkpSetahun').innerText = formatRupiah(pkp);
 
@@ -355,25 +373,21 @@
             const nilaiSelisih = document.getElementById('nilaiSelisihDesember');
             const keteranganDetail = document.getElementById('statusKeteranganDetail');
 
-            // Reset class styling badge
             containerBadge.className = "p-4 rounded-xl text-center flex flex-col justify-center items-center h-full border";
 
             if (selisihDesember > 0) {
-                // Kurang Bayar (Normalnya masa Desember memotong sisa ini)
                 containerBadge.classList.add("bg-red-950", "border-red-700", "text-red-200");
                 textStatus.innerText = "🔴 KURANG BAYAR (MASA DESEMBER)";
                 nilaiSelisih.innerText = formatRupiah(selisihDesember);
                 nilaiSelisih.className = "text-2xl font-black mt-1 text-red-400";
                 keteranganDetail.innerText = "Sisa pajak yang wajib dipotong perusahaan pada bulan Desember.";
             } else if (selisihDesember < 0) {
-                // Lebih Bayar
                 containerBadge.classList.add("bg-amber-950", "border-amber-700", "text-amber-200");
                 textStatus.innerText = "🟡 LEBIH BAYAR (RESTITUSI)";
                 nilaiSelisih.innerText = formatRupiah(Math.abs(selisihDesember));
                 nilaiSelisih.className = "text-2xl font-black mt-1 text-amber-400";
                 keteranganDetail.innerText = "Kelebihan bayar pajak, perusahaan wajib mengembalikan uang ini ke karyawan.";
             } else {
-                // Nihil
                 containerBadge.classList.add("bg-emerald-950", "border-emerald-700", "text-emerald-200");
                 textStatus.innerText = "🟢 NIHIL / PAS";
                 nilaiSelisih.innerText = "Rp 0";
@@ -382,7 +396,7 @@
             }
         }
 
-        // Trigger perhitungan pertama kali saat aplikasi dibuka
+        // Jalankan kalkulasi perdana
         hitungSemuaPajak();
     </script>
 </body>

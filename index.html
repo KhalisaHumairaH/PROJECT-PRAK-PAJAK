@@ -97,7 +97,14 @@
                     <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 space-y-4 mb-4">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-medium text-gray-500">Persentase Tarif TER:</span>
-                            <span id="terPersen" class="text-base font-bold text-blue-700">0%</span>
+                            <div class="flex flex-col items-end gap-1">
+                                <span id="terPersen" class="text-base font-bold text-blue-700">0%</span>
+                                <span id="badgeTerNol" class="hidden text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-300 rounded-full px-2 py-0.5">⚠️ Di bawah ambang TER</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-blue-100 pt-2">
+                            <span class="text-xs font-medium text-gray-500">Dasar Penentuan Tarif (Rentang Bruto):</span>
+                            <span id="terRentang" class="text-[11px] font-semibold text-blue-600 text-right">-</span>
                         </div>
                         <div class="flex justify-between items-center border-t border-blue-100 pt-2">
                             <span class="text-xs font-medium text-gray-600">TER Terutang / Bulan:</span>
@@ -143,6 +150,10 @@
                         <div class="flex justify-between border-b border-gray-100 py-1.5 font-bold text-slate-700 bg-gray-50 px-1 rounded">
                             <span>Penghasilan Neto Setahun:</span>
                             <span id="netoSetahun">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
+                            <span>(-) PTKP:</span>
+                            <span id="ptkpSetahun">-Rp 0</span>
                         </div>
                         <div class="flex justify-between border-b border-gray-100 py-2 font-bold text-emerald-700 bg-emerald-50 px-2 rounded">
                             <span>Penghasilan Kena Pajak (PKP):</span>
@@ -277,6 +288,20 @@
             return 0;
         }
 
+        function dapatkanRentangTER(kategori, brutoBulanan) {
+            const listTarif = TER_MAPPING[kategori];
+            let prevMax = 0;
+            for (let r of listTarif) {
+                if (brutoBulanan <= r.max) {
+                    const bawah = prevMax > 0 ? formatRupiah(prevMax + 1) : 'Rp 0';
+                    const atas = r.max === Infinity ? 'ke atas' : formatRupiah(r.max);
+                    return `${bawah} – ${atas}`;
+                }
+                prevMax = r.max;
+            }
+            return '-';
+        }
+
         function hitungSemuaPajak() {
             // Ambil data input
             const ptkpSelect = document.getElementById('statusPtkp');
@@ -298,9 +323,21 @@
             const nominalTERBulanan = brutoBulanan * tarifTER;
             const totalTER11Bulan = nominalTERBulanan * 11;
 
+            const rentangTER = dapatkanRentangTER(kategoriTER, brutoBulanan);
             document.getElementById('terPersen').innerText = `${(tarifTER * 100).toFixed(2).replace('.00', '')}%`;
+            document.getElementById('terRentang').innerText = rentangTER;
             document.getElementById('terPerBulan').innerText = formatRupiah(nominalTERBulanan);
             document.getElementById('totalTer11Bulan').innerText = formatRupiah(totalTER11Bulan);
+
+            // Badge indikator TER 0%
+            const badgeTerNol = document.getElementById('badgeTerNol');
+            if (tarifTER === 0 && brutoBulanan > 0) {
+                const ambangKategori = TER_MAPPING[kategoriTER][0].max;
+                badgeTerNol.innerText = `⚠️ Bruto ≤ ${formatRupiah(ambangKategori)} → TER 0%`;
+                badgeTerNol.classList.remove('hidden');
+            } else {
+                badgeTerNol.classList.add('hidden');
+            }
 
             // ==========================================
             // LOGIKA 2: PERHITUNGAN PROGRESIF PASAL 17 (TAHUNAN)
@@ -317,6 +354,7 @@
 
             let pkp = netoTahunan - nilaiPtkp;
             if (pkp < 0) pkp = 0;
+            pkp = Math.floor(pkp / 1000) * 1000; // Pembulatan ke bawah ke ribuan (UU PPh Ps. 17 ay. 4)
 
             // Render komponen ke UI progresif secara transparan
             document.getElementById('gajiSetahun').innerText = formatRupiah(gajiDisetahunkan);
@@ -325,6 +363,7 @@
             document.getElementById('biayaJabatanSetahun').innerText = `-${formatRupiah(biayaJabatanTahunan)}`;
             document.getElementById('iuranPensiunSetahun').innerText = `-${formatRupiah(iuranPensiunTahunan)}`; // Menampilkan pengurang iuran
             document.getElementById('netoSetahun').innerText = formatRupiah(netoTahunan);
+            document.getElementById('ptkpSetahun').innerText = `-${formatRupiah(nilaiPtkp)}`;
             document.getElementById('pkpSetahun').innerText = formatRupiah(pkp);
 
             // Hitung bracket progresif Pasal 17 UU HPP

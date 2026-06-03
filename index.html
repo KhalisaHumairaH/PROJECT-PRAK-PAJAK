@@ -1,442 +1,960 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator PPh 21 - Komparasi TER & Progresif (with Bonus/THR)</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Pajak Indonesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f3ede1;
+    --cream-card:#fbf8f1;
+    --cream-input:#f7f1e6;
+    --ink:#23211c;
+    --muted:#8a8374;
+    --line:#e6ddcc;
+    --green:#16412f;
+    --green-2:#1d5640;
+    --gold:#c98a1a;
+    --gold-soft:#e6d3a8;
+    --blue:#2d6fb0;
+    --red:#7a1414;
+    --red-bright:#ff5a5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Inter',sans-serif;
+    background:
+      radial-gradient(900px 500px at 80% -5%, #fcf7ec 0%, transparent 60%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:'Fraunces',serif;}
+  #root{max-width:1120px;margin:0 auto;padding:34px 22px 80px;}
+
+  /* HOME */
+  .home{position:relative;}
+
+  .hero{
+    position:relative;
+    margin:10px 2px 38px;
+    padding:6px 2px 2px;
+    overflow:visible;
+  }
+  .hero-deco{
+    position:absolute;
+    right:-10px;top:-46px;
+    font-family:'Fraunces',serif;
+    font-weight:900;
+    font-size:230px;
+    line-height:1;
+    color:var(--green);
+    opacity:.06;
+    pointer-events:none;
+    user-select:none;
+  }
+  @media(max-width:680px){.hero-deco{font-size:150px;top:-20px;}}
+  .kicker{
+    display:inline-block;
+    font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--green-2);
+    background:#e7efe8;
+    border:1px solid #d2e2d4;
+    padding:7px 14px;border-radius:30px;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:58px;letter-spacing:-1.6px;line-height:1.0;
+    color:var(--ink);
+    position:relative;
+  }
+  .hero h1 em{font-style:italic;font-weight:500;color:var(--green-2);}
+  @media(max-width:680px){.hero h1{font-size:40px;}}
+  .hero p{color:var(--muted);font-size:16.5px;margin-top:18px;max-width:540px;line-height:1.55;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;position:relative;z-index:1;}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .tile{
+    background:var(--cream-card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:28px 28px 24px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease, border-color .2s ease;
+    box-shadow:0 1px 0 rgba(0,0,0,.02);
+  }
+  /* subtle green wash that slides in on hover */
+  .tile::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(135deg, rgba(22,65,47,.05), transparent 55%);
+    opacity:0;transition:opacity .25s ease;
+  }
+  .tile:hover::before{opacity:1;}
+  .tile:hover{transform:translateY(-4px);box-shadow:0 22px 44px -24px rgba(30,40,20,.4);border-color:#cdbf9f;}
+  .tile .tnum{
+    position:absolute;top:22px;left:28px;
+    font-family:'Fraunces',serif;font-weight:900;font-size:13px;
+    color:#c3b79e;letter-spacing:1px;
+  }
+  .tile .arrow{
+    position:absolute;top:24px;right:26px;
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:#efe7d6;color:#9a8e76;font-size:17px;
+    transition:transform .2s ease, background .2s ease, color .2s ease;
+  }
+  .tile:hover .arrow{transform:translateX(3px);background:var(--green);color:#fff;}
+  .tile .emo{font-size:34px;display:block;margin-top:22px;position:relative;}
+  .tile h3{font-family:'Fraunces',serif;font-weight:700;font-size:24px;margin:14px 0 8px;letter-spacing:-.3px;position:relative;}
+  .tile p{color:var(--muted);font-size:14px;line-height:1.55;position:relative;margin-bottom:16px;}
+  .tile .ttag{
+    display:inline-block;position:relative;
+    font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    color:var(--green-2);
+    background:#eaf1eb;
+    padding:5px 11px;border-radius:8px;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .hero{animation:rise .5s ease both;}
+  .tile{animation:rise .5s ease both;}
+  .tile:nth-child(1){animation-delay:.06s;}
+  .tile:nth-child(2){animation-delay:.13s;}
+  .tile:nth-child(3){animation-delay:.20s;}
+  .tile:nth-child(4){animation-delay:.27s;}
+
+  /* PAGE */
+  .back{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-weight:600;font-size:14px;background:none;border:none;cursor:pointer;margin-bottom:20px;padding:8px 12px;border-radius:10px;}
+  .back:hover{background:#ece3d2;color:var(--ink);}
+  .ptitle{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+  .ptitle .emo{font-size:34px;}
+  .ptitle h2{font-family:'Fraunces',serif;font-weight:900;font-size:36px;letter-spacing:-.5px;}
+  .psub{color:var(--muted);font-size:15px;margin:0 0 26px 2px;}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;}
+  @media(max-width:840px){.cols{grid-template-columns:1fr}}
+
+  .panel{background:var(--cream-card);border:1px solid var(--line);border-radius:18px;padding:26px;}
+  .panel h4{font-size:16px;font-weight:600;margin-bottom:4px;}
+  .panel .hint{color:var(--muted);font-size:13px;margin-bottom:14px;}
+  label.fld{display:block;font-size:14.5px;font-weight:600;margin:18px 0 6px;}
+  label.fld:first-of-type{margin-top:0;}
+  .small{color:var(--muted);font-weight:400;font-size:12.5px;margin-bottom:8px;}
+  .inputwrap{position:relative;}
+  .inputwrap .rp{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;}
+  input.money{
+    width:100%;padding:15px 16px 15px 42px;border:1px solid var(--line);
+    border-radius:12px;background:var(--cream-input);font-size:19px;font-weight:700;
+    font-family:'Inter',sans-serif;letter-spacing:.3px;color:var(--ink);outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input.money:focus{border-color:var(--green-2);box-shadow:0 0 0 3px rgba(29,86,64,.12);}
+  input.money.plain{padding-left:16px;}
+  select{
+    width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:12px;
+    background:var(--cream-input);font-size:15px;font-weight:600;color:var(--ink);
+    font-family:'Inter',sans-serif;cursor:pointer;outline:none;
+  }
+  select:focus{border-color:var(--green-2);}
+
+  .note{background:var(--gold-soft);border-radius:12px;padding:14px 16px;display:flex;gap:10px;font-size:13.5px;line-height:1.5;color:#5e4a1c;margin-top:18px;}
+  .note .i{flex-shrink:0;opacity:.7;}
+  .note b{color:#4a3a14;}
+
+  /* toggle */
+  .seg{display:flex;background:var(--cream-input);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-top:6px;}
+  .seg button{flex:1;border:none;background:none;padding:12px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted);font-family:'Inter';}
+  .seg button.on{background:var(--green);color:#fff;}
+  .seg3 button{font-size:13px;padding:11px 6px;}
+  .switchrow{display:flex;justify-content:space-between;align-items:center;background:var(--cream-input);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px;}
+  .switchrow .t b{font-size:14.5px;}
+  .switchrow .t span{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;max-width:300px;}
+  .sw{width:46px;height:26px;border-radius:20px;background:#cdbfa6;border:none;position:relative;cursor:pointer;flex-shrink:0;transition:background .18s;}
+  .sw.on{background:var(--green-2);}
+  .sw::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .18s;}
+  .sw.on::after{left:23px;}
+
+  /* RESULT card */
+  .result{background:linear-gradient(160deg,var(--green) 0%, #11321f 100%);border-radius:18px;padding:28px;color:#fff;box-shadow:0 20px 50px -28px rgba(15,40,25,.7);}
+  .result .lbl{color:#bcd1c5;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
+  .result .big{font-family:'Fraunces',serif;font-weight:700;font-size:56px;line-height:1.05;margin:8px 0 4px;letter-spacing:-1px;}
+  @media(max-width:480px){.result .big{font-size:42px}}
+  .result .sub{color:#cfe0d6;font-size:14px;}
+  .bar{height:11px;border-radius:8px;background:#fff;margin:20px 0 12px;overflow:hidden;display:flex;}
+  .bar .fill{background:var(--gold);height:100%;}
+  .legend{display:flex;gap:20px;font-size:13px;color:#dfeae3;flex-wrap:wrap;}
+  .legend .dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:middle;}
+  .splitrow{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.12);border-radius:12px;overflow:hidden;margin-top:20px;}
+  .splitrow .c{background:rgba(255,255,255,.04);padding:16px 18px;}
+  .splitrow .c .k{color:#aec6ba;font-size:12px;font-weight:600;}
+  .splitrow .c .v{font-family:'Fraunces',serif;font-weight:700;font-size:22px;margin-top:4px;}
+
+  .breakdown{background:var(--cream-card);border:1px solid var(--line);border-radius:18px;margin-top:18px;overflow:hidden;}
+  .bd-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink);font-family:'Inter';}
+  .bd-body{padding:4px 22px 22px;}
+  .bd-body .ttl{color:var(--gold);font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin:8px 0 14px;}
+  .ln{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--line);font-size:14.5px;}
+  .ln:last-child{border-bottom:none;}
+  .ln.indent{padding-left:18px;color:var(--muted);font-size:13.5px;}
+  .ln.total{border-top:2px solid var(--ink);margin-top:6px;padding-top:14px;font-weight:700;}
+  .ln.total .v{font-family:'Fraunces',serif;color:var(--green-2);font-size:18px;}
+  .ln .v{font-weight:600;}
+  .ln .v.red{color:var(--red);}
+
+  /* monthly omzet grid */
+  .months{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+  @media(max-width:480px){.months{grid-template-columns:1fr}}
+  .mfield label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+  .mfield .inputwrap .rp{font-size:13px;left:12px;}
+  .mfield input.money{font-size:14px;padding:10px 10px 10px 34px;font-weight:600;}
+  .mtools{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
+  .mtools button{font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--cream-input);padding:8px 12px;border-radius:9px;cursor:pointer;color:var(--ink);font-family:'Inter';}
+  .mtools button:hover{border-color:var(--green-2);}
+  .omzet-total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:14px 16px;background:var(--cream-input);border:1px solid var(--line);border-radius:12px;font-size:14px;}
+  .omzet-total b{font-family:'Fraunces',serif;font-size:18px;}
+
+  /* employee 3-col layout */
+  .empcols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--cream-card);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  @media(max-width:980px){.empcols{grid-template-columns:1fr;}}
+  .empcol{padding:26px;border-right:1px solid var(--line);}
+  @media(max-width:980px){.empcol{border-right:none;border-bottom:1px solid var(--line);}}
+  .empcol:last-child{border-right:none;}
+  .step{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .step .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+  .step .n.blue{background:var(--blue);}
+  .step .n.green{background:var(--green-2);}
+  .step h4{font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .erow{display:flex;justify-content:space-between;padding:9px 0;font-size:13.5px;border-bottom:1px solid #f0e9da;}
+  .erow:last-child{border-bottom:none;}
+  .erow .v{font-weight:600;}
+  .erow .v.blue{color:var(--blue);}
+  .erow .v.red{color:var(--red);}
+  .erow.hl{background:#eef5f0;margin:6px -10px;padding:11px 10px;border-radius:8px;border:none;}
+  .erow.hl .v{color:var(--green-2);font-weight:700;}
+  .erow.dim{color:#b8af9c;}
+  .erow.dim .v{color:#b8af9c;}
+  .erow.grand{border-top:2px solid var(--ink);margin-top:8px;padding-top:13px;font-weight:700;}
+  .erow.grand .v{font-family:'Fraunces';color:var(--green-2);font-size:18px;}
+  .sectlbl{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin:18px 0 6px;}
+  .terbox{background:var(--cream-input);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .terbox .erow{border-bottom:1px dashed var(--line);}
+  .terbox .erow .v.blue{font-weight:700;}
+  .terhl{background:#e9f0fb;border:1px solid #cfe0f5;border-radius:10px;padding:13px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
+  .terhl b{color:var(--blue);font-size:13px;}
+  .terhl .v{font-family:'Fraunces';color:var(--blue);font-size:21px;font-weight:700;}
+
+  .recon{background:linear-gradient(160deg,#1c1a17,#0f0d0b);border-radius:18px;padding:26px;margin-top:24px;color:#fff;}
+  .recon .rt{color:var(--gold);font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+  .recon .rgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:840px){.recon .rgrid{grid-template-columns:1fr;}}
+  .rcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;}
+  .rcard.danger{background:#2a0d0d;border-color:#5a1a1a;}
+  .rcard.good{background:#0f2a1c;border-color:#1d4a33;}
+  .rcard .rl{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#9a9285;font-weight:700;}
+  .rcard .rv{font-family:'Fraunces';font-size:30px;font-weight:700;margin:8px 0 6px;}
+  .rcard.danger .rv{color:var(--red-bright);}
+  .rcard.good .rv{color:#3fd98a;}
+  .rcard .rd{font-size:12px;color:#a39a8c;line-height:1.45;}
+  .rcard.danger .rd{color:#e7b6b6;}
+
+  .footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:50px;line-height:1.6;}
+</style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen py-10 px-4">
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const {useState, useMemo} = React;
 
-    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <div class="bg-gradient-to-r py-6 px-8 text-white text-center bg-slate-800">
-            <h1 class="text-2xl font-bold tracking-wide">KALKULATOR PAJAK PENGHASILAN (PPh) PASAL 21</h1>
-            <p class="text-sm opacity-90 mt-1">Simulasi Komparasi Tarif Progresif (Pasal 17) & Tarif Efektif Rata-Rata (TER) Bulanan</p>
+// ---------- helpers ----------
+const fmt = n => "Rp " + Math.round(n).toLocaleString("id-ID");
+const fmtNum = n => Math.round(n).toLocaleString("id-ID");
+const parseNum = s => Number(String(s).replace(/[^0-9]/g,"")) || 0;
+// tampilkan angka besar, atau tanda strip kalau input masih kosong/0
+const bigOr = (cond, value) => cond ? value : "—";
+
+function MoneyInput({value, onChange, plain, mini, placeholder}){
+  const display = value ? fmtNum(value) : "";
+  return (
+    <div className="inputwrap">
+      {!plain && <span className="rp">Rp</span>}
+      <input
+        className={"money"+(plain?" plain":"")}
+        inputMode="numeric"
+        value={display}
+        placeholder={placeholder||"0"}
+        onChange={e=>onChange(parseNum(e.target.value))}
+      />
+    </div>
+  );
+}
+
+function Breakdown({children, openDefault=true}){
+  const [open,setOpen]=useState(openDefault);
+  return (
+    <div className="breakdown">
+      <button className="bd-toggle" onClick={()=>setOpen(o=>!o)}>
+        <span>Lihat perhitungan lengkap</span>
+        <span style={{transform:open?"rotate(180deg)":"none",transition:".2s"}}>⌄</span>
+      </button>
+      {open && <div className="bd-body">{children}</div>}
+    </div>
+  );
+}
+
+// ========================================================
+// HOME
+// ========================================================
+const TILES = [
+  {id:"karyawan", emo:"💼", title:"PPh 21 Karyawan",
+   desc:"Simulasi pajak gaji karyawan: bandingkan potongan TER bulanan vs progresif setahun, lengkap dengan rekonsiliasi masa Desember.",
+   tag:"PPh 21 · PP 58/2023"},
+  {id:"bebas",    emo:"💻", title:"Pekerja Bebas",
+   desc:"Honor, komisi, atau bayaran sebagai bukan pegawai — freelancer & tenaga ahli.",
+   tag:"PPh 21 · DPP 50%"},
+  {id:"umkm",     emo:"🏪", title:"Usaha Kecil (UMKM)",
+   desc:"Toko, online shop, atau jasa dengan omzet di bawah Rp 4,8 M. Hitung dari omzet 12 bulan.",
+   tag:"PPh Final · PP 55/2022"},
+  {id:"ppn",      emo:"🛍️", title:"PPN Sebuah Harga",
+   desc:"Hitung Pajak Pertambahan Nilai dari harga barang atau jasa.",
+   tag:"PPN · Tarif 2025"},
+];
+
+function Home({go}){
+  return (
+    <div className="home">
+      <div className="hero">
+        <div className="hero-deco" aria-hidden="true">%</div>
+        <span className="kicker">Aturan terbaru 2025 · Indonesia</span>
+        <h1>Hitung pajakmu,<br/><em>tanpa pusing.</em></h1>
+        <p>PPh karyawan, pekerja bebas, UMKM, sampai PPN — semua dalam satu tempat.
+           Pilih situasimu, isi angkanya, langsung tahu hasilnya.</p>
+      </div>
+
+      <div className="grid">
+        {TILES.map((t,i)=>(
+          <div key={t.id} className="tile" onClick={()=>go(t.id)}>
+            <span className="tnum">{String(i+1).padStart(2,"0")}</span>
+            <span className="arrow">→</span>
+            <div className="emo">{t.emo}</div>
+            <h3>{t.title}</h3>
+            <p>{t.desc}</p>
+            <span className="ttag">{t.tag}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="footer">
+        Estimasi berdasarkan tarif pajak yang berlaku (PPh 21 PP 58/2023, PPh Final UMKM PP 55/2022, PPN 2025).<br/>
+        Hasil bersifat simulasi, bukan pengganti perhitungan resmi.
+      </div>
+    </div>
+  );
+}
+
+function PageHead({emo,title,sub,back}){
+  return (<>
+    <button className="back" onClick={back}>← Kembali</button>
+    <div className="ptitle"><span className="emo">{emo}</span><h2>{title}</h2></div>
+    <p className="psub">{sub}</p>
+  </>);
+}
+
+// ========================================================
+// 1. KARYAWAN  (PPh 21 — TER vs Progresif + rekonsiliasi Desember)
+// ========================================================
+const PTKP = {
+  "TK/0":54000000,"TK/1":58500000,"TK/2":63000000,"TK/3":67500000,
+  "K/0":58500000,"K/1":63000000,"K/2":67500000,"K/3":72000000,
+};
+// Pemetaan status PTKP -> kategori TER (PP 58/2023 & PMK 168/2023)
+// A: TK/0, TK/1, K/0 | B: TK/2, TK/3, K/1, K/2 | C: K/3
+const TER_KATEGORI = {
+  "TK/0":"A","TK/1":"A","K/0":"A",
+  "TK/2":"B","TK/3":"B","K/1":"B","K/2":"B",
+  "K/3":"C",
+};
+
+// Tabel TER bulanan kategori A (44 lapisan) — sesuai lampiran resmi
+const TER_A = [
+  [5400000,0],[5650000,0.0025],[5950000,0.005],[6300000,0.0075],[6750000,0.01],
+  [7500000,0.0125],[8550000,0.015],[9650000,0.0175],[10050000,0.02],[10350000,0.0225],
+  [10700000,0.025],[11050000,0.03],[11600000,0.035],[12500000,0.04],[13750000,0.05],
+  [15100000,0.06],[16950000,0.07],[19750000,0.08],[24150000,0.09],[26450000,0.10],
+  [28000000,0.11],[30050000,0.12],[32400000,0.13],[35400000,0.14],[39100000,0.15],
+  [43850000,0.16],[47800000,0.17],[51400000,0.18],[56300000,0.19],[62200000,0.20],
+  [68600000,0.21],[77500000,0.22],[89000000,0.23],[103000000,0.24],[125000000,0.25],
+  [157000000,0.26],[206000000,0.27],[337000000,0.28],[454000000,0.29],[550000000,0.30],
+  [695000000,0.31],[910000000,0.32],[1400000000,0.33],[Infinity,0.34],
+];
+// Tabel TER bulanan kategori B (40 lapisan) — sesuai lampiran resmi
+const TER_B = [
+  [6200000,0],[6500000,0.0025],[6850000,0.005],[7300000,0.0075],[9200000,0.01],
+  [10750000,0.015],[11250000,0.02],[11600000,0.025],[12600000,0.03],[13600000,0.04],
+  [14950000,0.05],[16400000,0.06],[18450000,0.07],[21850000,0.08],[26000000,0.09],
+  [27700000,0.10],[29350000,0.11],[31450000,0.12],[33950000,0.13],[37100000,0.14],
+  [41100000,0.15],[45800000,0.16],[49500000,0.17],[53800000,0.18],[58500000,0.19],
+  [64000000,0.20],[71000000,0.21],[80000000,0.22],[93000000,0.23],[109000000,0.24],
+  [129000000,0.25],[163000000,0.26],[211000000,0.27],[374000000,0.28],[459000000,0.29],
+  [555000000,0.30],[704000000,0.31],[957000000,0.32],[1405000000,0.33],[Infinity,0.34],
+];
+// Tabel TER bulanan kategori C (41 lapisan) — sesuai lampiran resmi
+const TER_C = [
+  [6600000,0],[6950000,0.0025],[7350000,0.005],[7800000,0.0075],[8850000,0.01],
+  [9800000,0.0125],[10950000,0.015],[11200000,0.0175],[12050000,0.02],[12950000,0.03],
+  [14150000,0.04],[15550000,0.05],[17050000,0.06],[19500000,0.07],[22700000,0.08],
+  [26600000,0.09],[28100000,0.10],[30100000,0.11],[32600000,0.12],[35400000,0.13],
+  [38900000,0.14],[43000000,0.15],[47400000,0.16],[51200000,0.17],[55800000,0.18],
+  [60400000,0.19],[66700000,0.20],[74500000,0.21],[83200000,0.22],[95600000,0.23],
+  [110000000,0.24],[134000000,0.25],[169000000,0.26],[221000000,0.27],[390000000,0.28],
+  [463000000,0.29],[561000000,0.30],[709000000,0.31],[965000000,0.32],[1419000000,0.33],
+  [Infinity,0.34],
+];
+const TER_TABLES = {A:TER_A, B:TER_B, C:TER_C};
+
+function terRate(bruto, kategori){
+  const tbl = TER_TABLES[kategori] || TER_A;
+  for(const [cap,rate] of tbl){ if(bruto<=cap) return rate; }
+  return 0.34;
+}
+function terRange(bruto, kategori){
+  const tbl = TER_TABLES[kategori] || TER_A;
+  let lo=0;
+  for(const [cap] of tbl){ if(bruto<=cap) return [lo, cap]; lo=cap; }
+  return [lo, Infinity];
+}
+// progresif pasal 17
+const BRACKETS = [
+  [60000000,0.05],[250000000,0.15],[500000000,0.25],[5000000000,0.30],[Infinity,0.35]
+];
+function progresif(pkp){
+  let tax=0, lower=0, layers=[];
+  for(const [cap,rate] of BRACKETS){
+    if(pkp>lower){
+      const amt = Math.min(pkp,cap)-lower;
+      tax += amt*rate;
+      layers.push({rate,amt,tax:amt*rate});
+    } else layers.push({rate,amt:0,tax:0});
+    lower=cap;
+  }
+  return {tax,layers};
+}
+
+function Karyawan({back}){
+  const [status,setStatus]=useState("TK/0");
+  const [bruto,setBruto]=useState(10000000);
+  const [pensiun,setPensiun]=useState(100000);
+  const [bonus,setBonus]=useState(0);
+  const [bulanKerja,setBulanKerja]=useState(12);
+
+  const ptkp = PTKP[status];
+  const kategori = TER_KATEGORI[status];
+  const rate = terRate(bruto, kategori);
+  const terMonth = Math.round(bruto*rate);
+  // TER dipotong tiap bulan kerja kecuali bulan terakhir (Desember/masa pajak terakhir)
+  const bulanTER = Math.max(0, bulanKerja-1);
+  const terTotal = terMonth*bulanTER;
+
+  // progresif untuk masa pajak terakhir (disetahunkan sesuai jumlah bulan kerja)
+  const grossYear = bruto*bulanKerja + bonus;
+  const biayaJabatan = Math.min(grossYear*0.05, 500000*bulanKerja);
+  const pensiunYear = pensiun*bulanKerja;
+  const neto = grossYear - biayaJabatan - pensiunYear;
+  const pkp = Math.max(0, Math.floor((neto - ptkp)/1000)*1000);
+  const {tax:taxYear, layers} = progresif(pkp);
+
+  const desember = Math.round(taxYear - terTotal);
+
+  // TER range display sesuai kategori
+  const [lo,hi] = terRange(bruto, kategori);
+
+  return (<div>
+    <PageHead back={back} emo="💼" title="PPh 21 Karyawan"
+      sub="Simulasi pajak gaji — bandingkan potongan TER bulanan (Jan–Nov) vs perhitungan progresif setahun, lalu lihat rekonsiliasi masa Desember." />
+
+    <div className="empcols">
+      {/* col 1 */}
+      <div className="empcol">
+        <div className="step"><span className="n">1</span><h4>Parameter Utama</h4></div>
+        <label className="fld">Status PTKP</label>
+        <select value={status} onChange={e=>setStatus(e.target.value)}>
+          {Object.keys(PTKP).map(k=>(
+            <option key={k} value={k}>{k} — {fmt(PTKP[k])}</option>
+          ))}
+        </select>
+        <label className="fld">Gaji / Penghasilan Bruto (per bulan)</label>
+        <MoneyInput value={bruto} onChange={setBruto}/>
+        <label className="fld">Iuran Pensiun / BPJS (per bulan)</label>
+        <MoneyInput value={pensiun} onChange={setPensiun}/>
+        <label className="fld">Bonus / THR / Kinerja (setahun)</label>
+        <MoneyInput value={bonus} onChange={setBonus}/>
+        <div className="small" style={{marginTop:6}}>Hanya menambah komponen bruto progresif di akhir tahun.</div>
+        <label className="fld">Jumlah bulan bekerja (tahun ini)</label>
+        <select value={bulanKerja} onChange={e=>setBulanKerja(Number(e.target.value))}>
+          {[12,11,10,9,8,7,6,5,4,3,2,1].map(n=>(
+            <option key={n} value={n}>{n} bulan</option>
+          ))}
+        </select>
+        <div className="small" style={{marginTop:6}}>Pilih lebih kecil dari 12 jika baru masuk/berhenti kerja di tengah tahun.</div>
+
+        <div className="terbox" style={{marginTop:20}}>
+          <div className="sectlbl" style={{margin:"0 0 8px"}}>Info Ringkas</div>
+          <div className="erow"><span>Nilai PTKP setahun</span><span className="v">{fmt(ptkp)}</span></div>
+          <div className="erow"><span>Kategori TER (otomatis)</span><span className="v blue">Kategori {kategori}</span></div>
+          <div className="erow"><span>Tarif TER bulan ini</span><span className="v blue">{(rate*100).toLocaleString("id-ID")}%</span></div>
         </div>
+      </div>
 
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <div class="space-y-6 lg:border-r lg:pr-6 border-gray-200">
-                <div>
-                    <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
-                        <span class="bg-slate-800 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">1</span>
-                        PARAMETER UTAMA
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status PTKP <span class="text-red-500">*</span></label>
-                            <select id="statusPtkp" class="w-full px-3 py-2 border border-gray-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-sm" onchange="hitungSemuaPajak()">
-                                <option value="54000000" data-kategori="A">TK/0 (Kategori TER A - Rp54.000.000)</option>
-                                <option value="58500000" data-kategori="A">TK/1 (Kategori TER A - Rp58.500.000)</option>
-                                <option value="63000000" data-kategori="B">TK/2 (Kategori TER B - Rp63.000.000)</option>
-                                <option value="67500000" data-kategori="B">TK/3 (Kategori TER B - Rp67.500.000)</option>
-                                <option value="58500000" data-kategori="A">K/0 (Kategori TER A - Rp58.500.000)</option>
-                                <option value="63000000" data-kategori="B">K/1 (Kategori TER B - Rp63.000.000)</option>
-                                <option value="67500000" data-kategori="B">K/2 (Kategori TER B - Rp67.500.000)</option>
-                                <option value="72000000" data-kategori="C">K/3 (Kategori TER C - Rp72.000.000)</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gaji / Penghasilan Bruto (Per Bulan) <span class="text-red-500">*</span></label>
-                            <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 text-sm font-medium">Rp</span>
-                                </div>
-                                <input type="text" id="brutoBulanInput" value="10.000.000" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-amber-50 font-bold text-lg" oninput="formatDanHitung(this)">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Iuran Pensiun / BPJS (Per Bulan)</label>
-                            <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-400 text-xs">Rp</span>
-                                </div>
-                                <input type="text" id="iuranPensiunInput" value="100.000" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-amber-50 text-sm" oninput="formatDanHitung(this)">
-                            </div>
-                        </div>
-
-                        <div class="pt-2 border-t border-gray-100">
-                            <label class="block text-sm font-medium text-blue-900 mb-1">Bonus / THR / Kinerja (Setahun)</label>
-                            <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-blue-500 text-sm font-bold">Rp</span>
-                                </div>
-                                <input type="text" id="bonusThrInput" value="0" class="w-full pl-10 pr-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-right bg-blue-50/50 font-bold text-sm text-blue-950" placeholder="Isi nominal bonus jika ada" oninput="formatDanHitung(this)">
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-1">※ Hanya menambah komponen bruto progresif akhir tahun.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-2">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Info Ringkas Parameter</h3>
-                    <div class="flex justify-between text-xs font-medium text-gray-600">
-                        <span>Nilai PTKP Setahun:</span>
-                        <span id="labelNilaiPtkp">Rp 54.000.000</span>
-                    </div>
-                    <div class="flex justify-between text-xs font-medium text-gray-600">
-                        <span>Golongan TER Bulanan:</span>
-                        <span id="labelKategoriTER" class="font-bold text-blue-600">Kategori A</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-6 lg:border-r lg:px-6 border-gray-200">
-                <div>
-                    <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
-                        <span class="bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">2</span>
-                        METODE TER (JAN - NOV)
-                    </h2>
-                    
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 space-y-4 mb-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-medium text-gray-500">Persentase Tarif TER:</span>
-                            <div class="flex flex-col items-end gap-1">
-                                <span id="terPersen" class="text-base font-bold text-blue-700">0%</span>
-                                <span id="badgeTerNol" class="hidden text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-300 rounded-full px-2 py-0.5">⚠️ Di bawah ambang TER</span>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center border-t border-blue-100 pt-2">
-                            <span class="text-xs font-medium text-gray-500">Dasar Penentuan Tarif (Rentang Bruto):</span>
-                            <span id="terRentang" class="text-[11px] font-semibold text-blue-600 text-right">-</span>
-                        </div>
-                        <div class="flex justify-between items-center border-t border-blue-100 pt-2">
-                            <span class="text-xs font-medium text-gray-600">TER Terutang / Bulan:</span>
-                            <span id="terPerBulan" class="text-base font-bold text-slate-900">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between items-center border-t border-dashed border-blue-200 pt-2 bg-blue-100/40 p-2 rounded-lg">
-                            <span class="text-xs font-bold text-blue-800">Total Terpotong (11 Bulan):</span>
-                            <span id="totalTer11Bulan" class="text-base font-black text-blue-900">Rp 0</span>
-                        </div>
-                    </div>
-                    <p class="text-[11px] text-gray-400 leading-relaxed">Formulasi TER dihitung langsung dari perkalian <strong>Penghasilan Bruto Sebulan × %Tarif TER Kategori</strong> berdasarkan PP No. 58 Tahun 2023.</p>
-                </div>
-            </div>
-
-            <div class="space-y-6 lg:pl-6">
-                <div>
-                    <h2 class="text-base font-bold text-slate-700 border-b pb-2 mb-4 flex items-center gap-2">
-                        <span class="bg-emerald-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
-                        METODE PROGRESIF (SETAHUN)
-                    </h2>
-                    
-                    <div class="space-y-2 text-xs">
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-gray-500">
-                            <span>Gaji Pokok Disetahunkan (12x):</span>
-                            <span id="gajiSetahun">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-blue-600">
-                            <span>(+) Bonus / THR (Setahun):</span>
-                            <span id="bonusThrSetahun">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1.5 font-bold text-slate-700 bg-gray-50 px-1 rounded">
-                            <span>Total Bruto Kumulatif:</span>
-                            <span id="brutoSetahun">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
-                            <span>(-) Biaya Jabatan (5%, maks 6jt):</span>
-                            <span id="biayaJabatanSetahun">-Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
-                            <span>(-) Iuran Pensiun / BPJS (Setahun):</span>
-                            <span id="iuranPensiunSetahun">-Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1.5 font-bold text-slate-700 bg-gray-50 px-1 rounded">
-                            <span>Penghasilan Neto Setahun:</span>
-                            <span id="netoSetahun">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-1 font-medium text-red-600">
-                            <span>(-) PTKP:</span>
-                            <span id="ptkpSetahun">-Rp 0</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-2 font-bold text-emerald-700 bg-emerald-50 px-2 rounded">
-                            <span>Penghasilan Kena Pajak (PKP):</span>
-                            <span id="pkpSetahun">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Lapisan Pajak Pasal 17:</h4>
-                        <div id="containerLapisanProgresif" class="space-y-1 text-[11px] font-medium text-gray-600 max-h-[140px] overflow-y-auto">
-                            </div>
-                    </div>
-
-                    <div class="flex justify-between items-center border-t border-gray-200 pt-3 mt-3">
-                        <span class="text-xs font-bold text-slate-700">Total PPh 21 Setahun:</span>
-                        <span id="totalPajakProgresif" class="text-base font-bold text-emerald-700">Rp 0</span>
-                    </div>
-                </div>
-            </div>
-
+      {/* col 2 — TER */}
+      <div className="empcol">
+        <div className="step"><span className="n blue">2</span><h4>Metode TER (Masa Awal)</h4></div>
+        <div className="terbox">
+          <div className="erow"><span>Kategori TER</span><span className="v blue">Kategori {kategori}</span></div>
+          <div className="erow"><span>Persentase Tarif TER</span><span className="v blue">{(rate*100).toLocaleString("id-ID")}%</span></div>
+          <div className="erow"><span>Rentang bruto kategori</span>
+            <span className="v blue">{fmt(lo+1)} – {hi===Infinity?"∞":fmt(hi)}</span></div>
+          <div className="erow"><span>TER terutang / bulan</span><span className="v">{fmt(terMonth)}</span></div>
+          <div className="terhl"><b>Total terpotong ({bulanTER} bulan)</b><span className="v">{fmt(terTotal)}</span></div>
         </div>
-
-        <div class="bg-slate-900 text-white p-6 border-t border-slate-700">
-            <h2 class="text-lg font-bold tracking-wide flex items-center gap-2 mb-4 text-amber-400">
-                👑 REKONSILIASI & KESIMPULAN MASA DESEMBER
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <span class="block text-xs uppercase text-slate-400 font-medium">A. Beban Pajak Riil Seharusnya (Setahun)</span>
-                    <span id="kesimpulanSeharusnya" class="text-xl font-bold text-emerald-400 block mt-1">Rp 0</span>
-                    <p class="text-[10px] text-slate-400 mt-1">Dihitung menggunakan skema progresif Pasal 17</p>
-                </div>
-
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <span class="block text-xs uppercase text-slate-400 font-medium">B. Total Terbayar via TER (Jan - Nov)</span>
-                    <span id="kesimpulanTerbayarTER" class="text-xl font-bold text-blue-400 block mt-1">Rp 0</span>
-                    <p class="text-[10px] text-slate-400 mt-1">Hasil akumulasi pemotongan masa 11 bulan pertama</p>
-                </div>
-
-                <div id="badgeStatusContainer" class="p-4 rounded-xl text-center flex flex-col justify-center items-center h-full border">
-                    <span id="teksStatusPajak" class="text-xs uppercase font-bold tracking-widest text-slate-300">STATUS PEMBAYARAN</span>
-                    <span id="nilaiSelisihDesember" class="text-2xl font-black mt-1">Rp 0</span>
-                    <span id="statusKeteranganDetail" class="text-xs font-semibold mt-1">Memproses data...</span>
-                </div>
-            </div>
+        <div className="small" style={{marginTop:14,lineHeight:1.5}}>
+          TER kategori {kategori} dipilih otomatis dari status PTKP. Dihitung dari Penghasilan Bruto Sebulan × %Tarif TER, sesuai PP No. 58 Tahun 2023. Bulan terakhir memakai metode progresif.
         </div>
+      </div>
+
+      {/* col 3 — progresif */}
+      <div className="empcol">
+        <div className="step"><span className="n green">3</span><h4>Metode Progresif (Setahun)</h4></div>
+        <div className="erow"><span>Gaji pokok ({bulanKerja}×)</span><span className="v">{fmt(bruto*bulanKerja)}</span></div>
+        <div className="erow"><span>(+) Bonus / THR (setahun)</span><span className="v blue">{fmt(bonus)}</span></div>
+        <div className="erow" style={{fontWeight:700}}><span>Total bruto kumulatif</span><span className="v">{fmt(grossYear)}</span></div>
+        <div className="erow"><span>(−) Biaya jabatan (5%, maks 6jt)</span><span className="v red">−{fmt(biayaJabatan)}</span></div>
+        <div className="erow"><span>(−) Iuran pensiun</span><span className="v red">−{fmt(pensiunYear)}</span></div>
+        <div className="erow" style={{fontWeight:700}}><span>Penghasilan neto</span><span className="v">{fmt(neto)}</span></div>
+        <div className="erow"><span>(−) PTKP</span><span className="v red">−{fmt(ptkp)}</span></div>
+        <div className="erow hl"><span>Penghasilan Kena Pajak (PKP)</span><span className="v">{fmt(pkp)}</span></div>
+
+        <div className="sectlbl">Lapisan Pajak Pasal 17</div>
+        {layers.map((l,i)=>(
+          <div key={i} className={"erow"+(l.amt<=0?" dim":"")}>
+            <span>Lapisan {i+1} ({(l.rate*100)}%)</span>
+            <span className="v">{fmt(l.tax)}</span>
+          </div>
+        ))}
+        <div className="erow grand"><span>Total PPh 21 setahun</span><span className="v">{fmt(taxYear)}</span></div>
+      </div>
     </div>
 
-    <script>
-        const TER_MAPPING = {
-            'A': [
-                { max: 5400000, rate: 0 }, { max: 5650000, rate: 0.0025 }, { max: 5950000, rate: 0.005 },
-                { max: 6300000, rate: 0.0075 }, { max: 6750000, rate: 0.01 }, { max: 7500000, rate: 0.0125 },
-                { max: 8550000, rate: 0.015 }, { max: 9650000, rate: 0.0175 }, { max: 10050000, rate: 0.02 },
-                { max: 10350000, rate: 0.0225 }, { max: 10700000, rate: 0.025 }, { max: 11050000, rate: 0.03 },
-                { max: 11600000, rate: 0.035 }, { max: 12500000, rate: 0.04 }, { max: 13750000, rate: 0.05 },
-                { max: 15100000, rate: 0.06 }, { max: 16950000, rate: 0.07 }, { max: 19750000, rate: 0.08 },
-                { max: 24150000, rate: 0.09 }, { max: 26450000, rate: 0.10 }, { max: 28000000, rate: 0.11 },
-                { max: 30050000, rate: 0.12 }, { max: 32400000, rate: 0.13 }, { max: 35400000, rate: 0.14 },
-                { max: 39100000, rate: 0.15 }, { max: 43850000, rate: 0.16 }, { max: 47800000, rate: 0.17 },
-                { max: 51400000, rate: 0.18 }, { max: 56300000, rate: 0.19 }, { max: 62200000, rate: 0.20 },
-                { max: 68600000, rate: 0.21 }, { max: 77500000, rate: 0.22 }, { max: 89000000, rate: 0.23 },
-                { max: 103000000, rate: 0.24 }, { max: 125000000, rate: 0.25 }, { max: 157000000, rate: 0.26 },
-                { max: 206000000, rate: 0.27 }, { max: 337000000, rate: 0.28 }, { max: 454000000, rate: 0.29 },
-                { max: 550000000, rate: 0.30 }, { max: 695000000, rate: 0.31 }, { max: 910000000, rate: 0.32 },
-                { max: 1400000000, rate: 0.33 }, { max: Infinity, rate: 0.34 }
-            ],
-            'B': [
-                { max: 6200000, rate: 0 }, { max: 6500000, rate: 0.0025 }, { max: 6850000, rate: 0.005 },
-                { max: 7300000, rate: 0.0075 }, { max: 7800000, rate: 0.01 }, { max: 8850000, rate: 0.0125 },
-                { max: 9800000, rate: 0.015 }, { max: 10750000, rate: 0.0175 }, { max: 11250000, rate: 0.02 },
-                { max: 11600000, rate: 0.0225 }, { max: 12600000, rate: 0.025 }, { max: 13600000, rate: 0.03 },
-                { max: 14950000, rate: 0.035 }, { max: 16400000, rate: 0.04 }, { max: 18450000, rate: 0.05 },
-                { max: 21850000, rate: 0.06 }, { max: 26000000, rate: 0.07 }, { max: 27700000, rate: 0.08 },
-                { max: 29350000, rate: 0.09 }, { max: 31450000, rate: 0.10 }, { max: 33950000, rate: 0.11 },
-                { max: 37100000, rate: 0.12 }, { max: 41100000, rate: 0.13 }, { max: 45800000, rate: 0.14 },
-                { max: 49500000, rate: 0.15 }, { max: 53800000, rate: 0.16 }, { max: 58500000, rate: 0.17 },
-                { max: 64000000, rate: 0.18 }, { max: 71000000, rate: 0.19 }, { max: 80000000, rate: 0.20 },
-                { max: 93000000, rate: 0.21 }, { max: 109000000, rate: 0.22 }, { max: 129000000, rate: 0.23 },
-                { max: 163000000, rate: 0.24 }, { max: 211000000, rate: 0.25 }, { max: 374000000, rate: 0.26 },
-                { max: 459000000, rate: 0.27 }, { max: 555000000, rate: 0.28 }, { max: 704000000, rate: 0.29 },
-                { max: 957000000, rate: 0.30 }, { max: 1405000000, rate: 0.31 }, { max: Infinity, rate: 0.32 }
-            ],
-            'C': [
-                { max: 6600000, rate: 0 }, { max: 6950000, rate: 0.0025 }, { max: 7350000, rate: 0.005 },
-                { max: 7800000, rate: 0.0075 }, { max: 8320000, rate: 0.01 }, { max: 9450000, rate: 0.0125 },
-                { max: 10450000, rate: 0.015 }, { max: 11450000, rate: 0.0175 }, { max: 11950000, rate: 0.02 },
-                { max: 12450000, rate: 0.0225 }, { max: 13450000, rate: 0.025 }, { max: 14450000, rate: 0.03 },
-                { max: 15950000, rate: 0.035 }, { max: 17450000, rate: 0.04 }, { max: 19950000, rate: 0.05 },
-                { max: 22700000, rate: 0.06 }, { max: 26600000, rate: 0.07 }, { max: 28100000, rate: 0.08 },
-                { max: 30100000, rate: 0.09 }, { max: 32600000, rate: 0.10 }, { max: 35400000, rate: 0.11 },
-                { max: 38900000, rate: 0.12 }, { max: 43000000, rate: 0.13 }, { max: 47400000, rate: 0.14 },
-                { max: 51200000, rate: 0.15 }, { max: 55800000, rate: 0.16 }, { max: 60400000, rate: 0.17 },
-                { max: 66700000, rate: 0.18 }, { max: 74500000, rate: 0.19 }, { max: 83200000, rate: 0.20 },
-                { max: 95600000, rate: 0.21 }, { max: 110000000, rate: 0.22 }, { max: 134000000, rate: 0.23 },
-                { max: 169000000, rate: 0.24 }, { max: 221000000, rate: 0.25 }, { max: 390000000, rate: 0.26 },
-                { max: 463000000, rate: 0.27 }, { max: 561000000, rate: 0.28 }, { max: 709000000, rate: 0.29 },
-                { max: 965000000, rate: 0.30 }, { max: 1419000000, rate: 0.31 }, { max: Infinity, rate: 0.32 }
-            ]
-        };
+    {/* rekonsiliasi */}
+    <div className="recon">
+      <div className="rt">👑 Rekonsiliasi & Kesimpulan Masa Terakhir</div>
+      <div className="rgrid">
+        <div className="rcard good">
+          <div className="rl">A. Beban pajak riil (setahun)</div>
+          <div className="rv">{fmt(taxYear)}</div>
+          <div className="rd">Dihitung dengan skema progresif Pasal 17.</div>
+        </div>
+        <div className="rcard">
+          <div className="rl">B. Total terbayar via TER</div>
+          <div className="rv" style={{color:"#7fb6f0"}}>{fmt(terTotal)}</div>
+          <div className="rd">Akumulasi pemotongan {bulanTER} bulan pertama.</div>
+        </div>
+        {desember>=0 ? (
+          <div className="rcard danger">
+            <div className="rl">🔴 Kurang bayar (Masa Terakhir)</div>
+            <div className="rv">{fmt(Math.abs(desember))}</div>
+            <div className="rd">Sisa pajak yang dipotong perusahaan pada bulan terakhir.</div>
+          </div>
+        ) : (
+          <div className="rcard good">
+            <div className="rl">🟢 Lebih bayar (Masa Terakhir)</div>
+            <div className="rv">{fmt(Math.abs(desember))}</div>
+            <div className="rd">Kelebihan potong yang dikembalikan di bulan terakhir.</div>
+          </div>
+        )}
+      </div>
+      <div className="small" style={{color:"#9a9285",marginTop:16,lineHeight:1.5}}>
+        Simulasi mengasumsikan gaji tetap sepanjang masa kerja. Hasil dapat berbeda jika gaji berubah tiap bulan, ada potongan lain, atau ada penghasilan dari pemberi kerja lain.
+      </div>
+    </div>
+  </div>);
+}
 
-        const formatRupiah = (angka) => {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka);
-        };
+// ========================================================
+// 2. PEKERJA BEBAS (bukan pegawai) — 50% DPP, progresif
+//    Mode: sekali bayar  |  berkesinambungan (kumulatif setahun)
+// ========================================================
+function Bebas({back}){
+  const [mode,setMode]=useState("sekali"); // sekali | rutin
+  const [bayar,setBayar]=useState(20000000);
+  const [months,setMonths]=useState(Array(12).fill(20000000));
 
-        function getCleanNumber(stringId) {
-            const rawVal = document.getElementById(stringId).value;
-            return parseFloat(rawVal.replace(/\./g, '')) || 0;
-        }
+  const setMonth=(i,v)=>setMonths(m=>m.map((x,j)=>j===i?v:x));
+  const fillAll=v=>setMonths(Array(12).fill(v));
 
-        // Fungsi penata otomatis titik ribuan saat mengetik
-        function formatDanHitung(inputNode) {
-            let value = inputNode.value.replace(/\D/g, ""); // ambil angka saja
-            if (value === "") value = "0";
-            
-            inputNode.value = new Intl.NumberFormat('id-ID').format(parseInt(value, 10));
-            hitungSemuaPajak();
-        }
+  if(mode==="sekali"){
+    const dpp = bayar*0.5;
+    const {tax,layers} = progresif(dpp);
+    const bersih = bayar - tax;
+    const pct = bayar>0 ? (tax/bayar*100) : 0;
+    const activeLayers = layers.filter(l=>l.amt>0);
 
-        function dapatkanTarifTER(kategori, brutoBulanan) {
-            const listTarif = TER_MAPPING[kategori];
-            for (let r of listTarif) {
-                if (brutoBulanan <= r.max) {
-                    return r.rate;
-                }
-            }
-            return 0;
-        }
+    return (<div>
+      <PageHead back={back} emo="💻" title="Pekerja Bebas"
+        sub="Honor, komisi, atau bayaran sebagai bukan pegawai (freelancer, tenaga ahli)." />
+      <div className="cols">
+        <div>
+          <div className="panel">
+            <label className="fld">Jenis penghasilan</label>
+            <div className="seg">
+              <button className={mode==="sekali"?"on":""} onClick={()=>setMode("sekali")}>Honor sekali bayar</button>
+              <button className={mode==="rutin"?"on":""} onClick={()=>setMode("rutin")}>Rutin / berkesinambungan</button>
+            </div>
+            <h4 style={{marginTop:20}}>Berapa bayaran yang kamu terima?</h4>
+            <div className="hint">Nilai sebelum dipotong pajak, untuk satu pembayaran.</div>
+            <MoneyInput value={bayar} onChange={setBayar}/>
+            <div className="note">
+              <span className="i">ⓘ</span>
+              <span>Untuk bukan pegawai, hanya <b>separuh</b> bayaran yang dihitung sebagai dasar kena pajak, lalu dikenai tarif progresif Pasal 17. Mode ini untuk honor yang diterima <b>sekali</b> / tidak rutin.</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="result">
+            <div className="lbl">Kamu terima bersih</div>
+            <div className="big">{bigOr(bayar>0, fmt(bersih))}</div>
+            <div className="sub">Pajak dipotong: {fmt(tax)} ({pct.toLocaleString("id-ID",{maximumFractionDigits:2})}% dari bruto)</div>
+            <div className="bar"><div className="fill" style={{width:Math.min(pct,100)+"%"}}></div></div>
+            <div className="legend">
+              <span><span className="dot" style={{background:"#fff"}}></span>Diterima {fmt(bersih)}</span>
+              <span><span className="dot" style={{background:"var(--gold)"}}></span>Pajak {fmt(tax)}</span>
+            </div>
+          </div>
+          <Breakdown>
+            <div className="ttl">Cara perhitungannya</div>
+            <div className="ln"><span>Bayaran bruto</span><span className="v">{fmt(bayar)}</span></div>
+            <div className="ln"><span>Dasar kena pajak (50%)</span><span className="v">{fmt(dpp)}</span></div>
+            {activeLayers.length===0
+              ? <div className="ln indent"><span>Belum kena pajak</span><span className="v">{fmt(0)}</span></div>
+              : activeLayers.map((l,i)=>(
+                <div className="ln indent" key={i}><span>{(l.rate*100)}% × {fmt(l.amt)}</span><span className="v">{fmt(l.tax)}</span></div>
+              ))}
+            <div className="ln total"><span>Pajak (PPh 21) terutang</span><span className="v">{fmt(tax)}</span></div>
+          </Breakdown>
+        </div>
+      </div>
+    </div>);
+  }
 
-        function dapatkanRentangTER(kategori, brutoBulanan) {
-            const listTarif = TER_MAPPING[kategori];
-            let prevMax = 0;
-            for (let r of listTarif) {
-                if (brutoBulanan <= r.max) {
-                    const bawah = prevMax > 0 ? formatRupiah(prevMax + 1) : 'Rp 0';
-                    const atas = r.max === Infinity ? 'ke atas' : formatRupiah(r.max);
-                    return `${bawah} – ${atas}`;
-                }
-                prevMax = r.max;
-            }
-            return '-';
-        }
+  // ----- mode rutin: kumulatif sepanjang tahun -----
+  const MONTHS_B = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  let cumDPP=0, cumTaxBefore=0;
+  const rows = months.map((m,i)=>{
+    const dppM = m*0.5;
+    const before = cumDPP;
+    cumDPP += dppM;
+    const taxCumNow = progresif(cumDPP).tax;
+    const taxThisMonth = taxCumNow - cumTaxBefore;
+    cumTaxBefore = taxCumNow;
+    return {bulan:MONTHS_B[i], bruto:m, dpp:dppM, cumDPP, tax:Math.max(0,taxThisMonth)};
+  });
+  const totalBruto = months.reduce((a,b)=>a+b,0);
+  const totalDPP = totalBruto*0.5;
+  const totalTax = progresif(totalDPP).tax;
+  const totalBersih = totalBruto - totalTax;
+  const pctR = totalBruto>0 ? (totalTax/totalBruto*100) : 0;
 
-        function hitungSemuaPajak() {
-            // Ambil data input
-            const ptkpSelect = document.getElementById('statusPtkp');
-            const nilaiPtkp = parseFloat(ptkpSelect.value);
-            const kategoriTER = ptkpSelect.options[ptkpSelect.selectedIndex].getAttribute('data-kategori');
-            
-            const brutoBulanan = getCleanNumber('brutoBulanInput');
-            const iuranPensiunBulanan = getCleanNumber('iuranPensiunInput');
-            const bonusThrTahunan = getCleanNumber('bonusThrInput');
+  return (<div>
+    <PageHead back={back} emo="💻" title="Pekerja Bebas"
+      sub="Honor, komisi, atau bayaran sebagai bukan pegawai (freelancer, tenaga ahli)." />
+    <div className="cols">
+      <div>
+        <div className="panel">
+          <label className="fld">Jenis penghasilan</label>
+          <div className="seg">
+            <button className={mode==="sekali"?"on":""} onClick={()=>setMode("sekali")}>Honor sekali bayar</button>
+            <button className={mode==="rutin"?"on":""} onClick={()=>setMode("rutin")}>Rutin / berkesinambungan</button>
+          </div>
 
-            // Tampilkan info ringkas parameter
-            document.getElementById('labelNilaiPtkp').innerText = formatRupiah(nilaiPtkp);
-            document.getElementById('labelKategoriTER').innerText = `Kategori ${kategoriTER}`;
+          <h4 style={{marginTop:20}}>Bayaran tiap bulan (1 tahun)</h4>
+          <div className="hint">Nilai bruto sebelum dipotong pajak, dari pemberi kerja yang sama.</div>
+          <div className="mtools">
+            <button onClick={()=>fillAll(20000000)}>Isi semua 20 jt</button>
+            <button onClick={()=>fillAll(months[0])}>Samakan dgn Januari</button>
+            <button onClick={()=>fillAll(0)}>Kosongkan</button>
+          </div>
+          <div className="months">
+            {months.map((m,i)=>(
+              <div className="mfield" key={i}>
+                <label>{MONTHS_B[i]}</label>
+                <MoneyInput value={m} onChange={v=>setMonth(i,v)}/>
+              </div>
+            ))}
+          </div>
+          <div className="omzet-total"><span>Total bruto setahun</span><b>{fmt(totalBruto)}</b></div>
+          <div className="note">
+            <span className="i">ⓘ</span>
+            <span>Untuk penghasilan <b>berkesinambungan</b> dari pemberi kerja yang sama, dasar kena pajak (50% tiap bulan) <b>ditumpuk</b> sepanjang tahun, sehingga tarif progresif naik mengikuti total kumulatif.</span>
+          </div>
+        </div>
+      </div>
 
-            // ==========================================
-            // LOGIKA 1: PERHITUNGAN TER BULANAN
-            // ==========================================
-            const tarifTER = dapatkanTarifTER(kategoriTER, brutoBulanan);
-            const nominalTERBulanan = brutoBulanan * tarifTER;
-            const totalTER11Bulan = nominalTERBulanan * 11;
+      <div>
+        <div className="result">
+          <div className="lbl">Total terima bersih (setahun)</div>
+          <div className="big">{bigOr(totalBruto>0, fmt(totalBersih))}</div>
+          <div className="sub">Pajak setahun: {fmt(totalTax)} ({pctR.toLocaleString("id-ID",{maximumFractionDigits:2})}% dari bruto)</div>
+          <div className="bar"><div className="fill" style={{width:Math.min(pctR,100)+"%"}}></div></div>
+          <div className="legend">
+            <span><span className="dot" style={{background:"#fff"}}></span>Diterima {fmt(totalBersih)}</span>
+            <span><span className="dot" style={{background:"var(--gold)"}}></span>Pajak {fmt(totalTax)}</span>
+          </div>
+          <div className="splitrow">
+            <div className="c"><div className="k">Total DPP (50%)</div><div className="v">{fmt(totalDPP)}</div></div>
+            <div className="c"><div className="k">Bruto setahun</div><div className="v">{fmt(totalBruto)}</div></div>
+          </div>
+        </div>
+        <Breakdown>
+          <div className="ttl">Rincian pajak per bulan (kumulatif)</div>
+          {rows.map((r,i)=>(
+            <div className="ln" key={i}>
+              <span>{r.bulan} — DPP kum. {fmt(r.cumDPP)}</span>
+              <span className="v">{fmt(r.tax)}</span>
+            </div>
+          ))}
+          <div className="ln total"><span>Total PPh 21 setahun</span><span className="v">{fmt(totalTax)}</span></div>
+        </Breakdown>
+      </div>
+    </div>
+  </div>);
+}
 
-            const rentangTER = dapatkanRentangTER(kategoriTER, brutoBulanan);
-            document.getElementById('terPersen').innerText = `${(tarifTER * 100).toFixed(2).replace('.00', '')}%`;
-            document.getElementById('terRentang').innerText = rentangTER;
-            document.getElementById('terPerBulan').innerText = formatRupiah(nominalTERBulanan);
-            document.getElementById('totalTer11Bulan').innerText = formatRupiah(totalTER11Bulan);
+// ========================================================
+// 3. UMKM — omzet 12 bulan, PP 55/2022 final 0,5%
+// ========================================================
+const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+function UMKM({back}){
+  const [pribadi,setPribadi]=useState(true);
+  const [months,setMonths]=useState(Array(12).fill(50000000));
 
-            // Badge indikator TER 0%
-            const badgeTerNol = document.getElementById('badgeTerNol');
-            if (tarifTER === 0 && brutoBulanan > 0) {
-                const ambangKategori = TER_MAPPING[kategoriTER][0].max;
-                badgeTerNol.innerText = `⚠️ Bruto ≤ ${formatRupiah(ambangKategori)} → TER 0%`;
-                badgeTerNol.classList.remove('hidden');
-            } else {
-                badgeTerNol.classList.add('hidden');
-            }
+  const setMonth=(i,v)=>setMonths(m=>m.map((x,j)=>j===i?v:x));
+  const fillAll=v=>setMonths(Array(12).fill(v));
 
-            // ==========================================
-            // LOGIKA 2: PERHITUNGAN PROGRESIF PASAL 17 (TAHUNAN)
-            // ==========================================
-            const gajiDisetahunkan = brutoBulanan * 12;
-            const brutoTahunan = gajiDisetahunkan + bonusThrTahunan; // Menambahkan komponen Bonus/THR ke Bruto Setahun
-            const iuranPensiunTahunan = iuranPensiunBulanan * 12;
-            
-            let biayaJabatanTahunan = brutoTahunan * 0.05;
-            if (biayaJabatanTahunan > 6000000) biayaJabatanTahunan = 6000000; // Cap batas biaya jabatan 6jt/tahun
+  const omzetTahun = months.reduce((a,b)=>a+b,0);
+  const bebas = pribadi ? 500000000 : 0;
+  const kena = Math.max(0, omzetTahun - bebas);
+  const pajakTahun = kena*0.005;
 
-            let netoTahunan = brutoTahunan - biayaJabatanTahunan - iuranPensiunTahunan;
-            if (netoTahunan < 0) netoTahunan = 0;
+  // monthly tax (cumulative threshold for pribadi)
+  let cum=0;
+  const monthlyTax = months.map(m=>{
+    const before=cum; cum+=m;
+    if(!pribadi) return m*0.005;
+    // taxable portion this month after 500jt threshold
+    const taxableThisMonth = Math.max(0, cum - bebas) - Math.max(0, before - bebas);
+    return taxableThisMonth*0.005;
+  });
+  const avgMonth = pajakTahun/12;
+  const lewatBatas = omzetTahun > 4800000000;
 
-            let pkp = netoTahunan - nilaiPtkp;
-            if (pkp < 0) pkp = 0;
-            pkp = Math.floor(pkp / 1000) * 1000; // Pembulatan ke bawah ke ribuan (UU PPh Ps. 17 ay. 4)
+  return (<div>
+    <PageHead back={back} emo="🏪" title="Usaha kecil (UMKM)"
+      sub="Untuk usaha dengan omzet di bawah Rp 4,8 miliar setahun." />
+    <div className="cols">
+      <div>
+        <div className="panel">
+          <h4>Berapa omzet (penjualan kotor) tiap bulan?</h4>
+          <div className="hint">Total uang masuk dari penjualan selama 1 tahun (12 bulan), sebelum dikurangi biaya apa pun.</div>
 
-            // Render komponen ke UI progresif secara transparan
-            document.getElementById('gajiSetahun').innerText = formatRupiah(gajiDisetahunkan);
-            document.getElementById('bonusThrSetahun').innerText = formatRupiah(bonusThrTahunan);
-            document.getElementById('brutoSetahun').innerText = formatRupiah(brutoTahunan);
-            document.getElementById('biayaJabatanSetahun').innerText = `-${formatRupiah(biayaJabatanTahunan)}`;
-            document.getElementById('iuranPensiunSetahun').innerText = `-${formatRupiah(iuranPensiunTahunan)}`; // Menampilkan pengurang iuran
-            document.getElementById('netoSetahun').innerText = formatRupiah(netoTahunan);
-            document.getElementById('ptkpSetahun').innerText = `-${formatRupiah(nilaiPtkp)}`;
-            document.getElementById('pkpSetahun').innerText = formatRupiah(pkp);
+          <div className="mtools">
+            <button onClick={()=>fillAll(50000000)}>Isi semua 50 jt</button>
+            <button onClick={()=>fillAll(months[0])}>Samakan dgn Januari</button>
+            <button onClick={()=>fillAll(0)}>Kosongkan</button>
+          </div>
 
-            // Hitung bracket progresif Pasal 17 UU HPP
-            let sisaPkp = pkp;
-            const tierProgresif = [
-                { limit: 60000000, rate: 0.05, label: "Lapisan 1 (5%): 0 s.d 60 Jt" },
-                { limit: 190000000, rate: 0.15, label: "Lapisan 2 (15%): >60 Jt s.d 250 Jt" },
-                { limit: 250000000, rate: 0.25, label: "Lapisan 3 (25%): >250 Jt s.d 500 Jt" },
-                { limit: 4500000000, rate: 0.30, label: "Lapisan 4 (30%): >500 Jt s.d 5 Milyar" },
-                { limit: Infinity, rate: 0.35, label: "Lapisan 5 (35%): Di atas 5 Milyar" }
-            ];
+          <div className="months">
+            {months.map((m,i)=>(
+              <div className="mfield" key={i}>
+                <label>{MONTHS[i]}</label>
+                <MoneyInput value={m} onChange={v=>setMonth(i,v)}/>
+              </div>
+            ))}
+          </div>
 
-            let totalPajakProgresifSetahun = 0;
-            let htmlLapisanStr = "";
+          <div className="omzet-total">
+            <span>Total omzet setahun</span>
+            <b>{fmt(omzetTahun)}</b>
+          </div>
 
-            for (let tier of tierProgresif) {
-                if (sisaPkp > 0) {
-                    let dppTier = Math.min(sisaPkp, tier.limit);
-                    let pajakTier = dppTier * tier.rate;
-                    totalPajakProgresifSetahun += pajakTier;
-                    sisaPkp -= dppTier;
+          {lewatBatas && (
+            <div className="note" style={{background:"#f6dcdc",color:"#7a1414"}}>
+              <span className="i">⚠️</span>
+              <span>Omzet setahun <b>melebihi Rp 4,8 miliar</b>. Usaha tidak lagi memenuhi syarat tarif final UMKM 0,5% dan wajib menghitung pajak dengan skema umum (pembukuan). Hasil di samping hanya gambaran kasar.</span>
+            </div>
+          )}
 
-                    htmlLapisanStr += `<div class="flex justify-between border-b border-gray-100 py-0.5">
-                        <span>${tier.label}</span>
-                        <span class="font-semibold text-gray-700">${formatRupiah(pajakTier)}</span>
-                    </div>`;
-                } else {
-                    htmlLapisanStr += `<div class="flex justify-between opacity-40 border-b border-gray-100 py-0.5">
-                        <span>${tier.label}</span>
-                        <span>Rp 0</span>
-                    </div>`;
-                }
-            }
-            document.getElementById('containerLapisanProgresif').innerHTML = htmlLapisanStr;
-            document.getElementById('totalPajakProgresif').innerText = formatRupiah(totalPajakProgresifSetahun);
+          <label className="fld">Usaha ini atas nama?</label>
+          <div className="seg">
+            <button className={pribadi?"on":""} onClick={()=>setPribadi(true)}>Pribadi</button>
+            <button className={!pribadi?"on":""} onClick={()=>setPribadi(false)}>Perusahaan (PT/CV)</button>
+          </div>
+          <div className="note">
+            <span className="i">ⓘ</span>
+            {pribadi
+              ? <span>Untuk usaha <b>pribadi</b>, Rp 500 juta omzet pertama setahun bebas pajak.</span>
+              : <span>Tarif pajak final UMKM <b>0,5%</b> dari omzet (tanpa batas bebas pajak).</span>}
+          </div>
+        </div>
+      </div>
 
-            // ==========================================
-            // LOGIKA 3: KESIMPULAN REKONSILIASI DESEMBER
-            // ==========================================
-            document.getElementById('kesimpulanSeharusnya').innerText = formatRupiah(totalPajakProgresifSetahun);
-            document.getElementById('kesimpulanTerbayarTER').innerText = formatRupiah(totalTER11Bulan);
+      <div>
+        <div className="result">
+          <div className="lbl">Pajak yang harus dibayar / tahun</div>
+          <div className="big">{bigOr(omzetTahun>0, fmt(pajakTahun))}</div>
+          <div className="sub">
+            {pribadi
+              ? "Rp 500 juta pertama setahun bebas pajak, sisanya kena 0,5%."
+              : "Dihitung 0,5% dari seluruh omzet."}
+          </div>
+          <div className="splitrow">
+            <div className="c"><div className="k">Rata-rata pajak / bulan</div><div className="v">{fmt(avgMonth)}</div></div>
+            <div className="c"><div className="k">Omzet / tahun</div><div className="v">{fmt(omzetTahun)}</div></div>
+          </div>
+        </div>
 
-            const selisihDesember = totalPajakProgresifSetahun - totalTER11Bulan;
-            const containerBadge = document.getElementById('badgeStatusContainer');
-            const textStatus = document.getElementById('teksStatusPajak');
-            const nilaiSelisih = document.getElementById('nilaiSelisihDesember');
-            const keteranganDetail = document.getElementById('statusKeteranganDetail');
+        <Breakdown>
+          <div className="ttl">Cara perhitungannya</div>
+          <div className="ln"><span>Omzet setahun (12 bulan)</span><span className="v">{fmt(omzetTahun)}</span></div>
+          {pribadi && <div className="ln"><span>Bebas pajak (500 jt pertama)</span><span className="v red">− {fmt(Math.min(bebas,omzetTahun))}</span></div>}
+          <div className="ln"><span>Omzet kena pajak</span><span className="v">{fmt(kena)}</span></div>
+          <div className="ln"><span>Tarif final</span><span className="v">0,5%</span></div>
+          <div className="ln total"><span>Pajak setahun</span><span className="v">{fmt(pajakTahun)}</span></div>
 
-            containerBadge.className = "p-4 rounded-xl text-center flex flex-col justify-center items-center h-full border";
+          <div className="ttl" style={{marginTop:18}}>Rincian pajak per bulan</div>
+          {months.map((m,i)=>(
+            <div className="ln" key={i}>
+              <span>{MONTHS[i]} — omzet {fmt(m)}</span>
+              <span className="v">{fmt(monthlyTax[i])}</span>
+            </div>
+          ))}
+        </Breakdown>
+      </div>
+    </div>
+  </div>);
+}
 
-            if (selisihDesember > 0) {
-                containerBadge.classList.add("bg-red-950", "border-red-700", "text-red-200");
-                textStatus.innerText = "🔴 KURANG BAYAR (MASA DESEMBER)";
-                nilaiSelisih.innerText = formatRupiah(selisihDesember);
-                nilaiSelisih.className = "text-2xl font-black mt-1 text-red-400";
-                keteranganDetail.innerText = "Sisa pajak yang wajib dipotong perusahaan pada bulan Desember.";
-            } else if (selisihDesember < 0) {
-                containerBadge.classList.add("bg-amber-950", "border-amber-700", "text-amber-200");
-                textStatus.innerText = "🟡 LEBIH BAYAR (RESTITUSI)";
-                nilaiSelisih.innerText = formatRupiah(Math.abs(selisihDesember));
-                nilaiSelisih.className = "text-2xl font-black mt-1 text-amber-400";
-                keteranganDetail.innerText = "Kelebihan bayar pajak, perusahaan wajib mengembalikan uang ini ke karyawan.";
-            } else {
-                containerBadge.classList.add("bg-emerald-950", "border-emerald-700", "text-emerald-200");
-                textStatus.innerText = "🟢 NIHIL / PAS";
-                nilaiSelisih.innerText = "Rp 0";
-                nilaiSelisih.className = "text-2xl font-black mt-1 text-emerald-400";
-                keteranganDetail.innerText = "Jumlah pajak TER yang dipotong sudah pas dengan tarif progresif asli.";
-            }
-        }
+// ========================================================
+// 4. PPN — umum: 12% × (11/12 × harga) = efektif 11%
+//          mewah: 12% × harga penuh (sejak 1 Feb 2025)
+//          bebas: 0% (kebutuhan pokok & jasa tertentu)
+// ========================================================
+function PPN({back}){
+  const [harga,setHarga]=useState(1000000);
+  const [termasuk,setTermasuk]=useState(false);
+  const [jenis,setJenis]=useState("umum"); // umum | mewah | bebas
 
-        // Jalankan kalkulasi perdana
-        hitungSemuaPajak();
-    </script>
+  let hargaDasar, dpp, ppn, total;
+  if(jenis==="bebas"){
+    hargaDasar = harga; dpp = 0; ppn = 0; total = harga;
+  } else if(jenis==="mewah"){
+    if(termasuk){ total=harga; hargaDasar=total/1.12; ppn=total-hargaDasar; dpp=hargaDasar; }
+    else { hargaDasar=harga; dpp=harga; ppn=harga*0.12; total=harga+ppn; }
+  } else { // umum
+    if(termasuk){ total=harga; hargaDasar=total/1.11; dpp=hargaDasar*(11/12); ppn=total-hargaDasar; }
+    else { hargaDasar=harga; dpp=harga*(11/12); ppn=dpp*0.12; total=harga+ppn; }
+  }
+  const pct = total>0 ? (ppn/total*100) : 0;
+
+  return (<div>
+    <PageHead back={back} emo="🛍️" title="PPN Sebuah Harga"
+      sub="Hitung Pajak Pertambahan Nilai dari harga barang atau jasa." />
+    <div className="cols">
+      <div>
+        <div className="panel">
+          <h4>Berapa harganya?</h4>
+          <div className="hint">Harga barang atau jasa.</div>
+          <MoneyInput value={harga} onChange={setHarga}/>
+
+          <label className="fld">Jenis barang / jasa</label>
+          <div className="seg seg3">
+            <button className={jenis==="umum"?"on":""} onClick={()=>setJenis("umum")}>Umum</button>
+            <button className={jenis==="mewah"?"on":""} onClick={()=>setJenis("mewah")}>Mewah</button>
+            <button className={jenis==="bebas"?"on":""} onClick={()=>setJenis("bebas")}>Bebas PPN</button>
+          </div>
+
+          {jenis!=="bebas" && (
+            <div className="switchrow">
+              <div className="t"><b>Harga ini sudah termasuk PPN?</b>
+                <span>Nyalakan jika harga yang ditampilkan sudah final.</span></div>
+              <button className={"sw"+(termasuk?" on":"")} onClick={()=>setTermasuk(t=>!t)}></button>
+            </div>
+          )}
+
+          <div className="note">
+            <span className="i">ⓘ</span>
+            {jenis==="umum" && <span>Barang/jasa <b>umum</b>: PPN = 12% × (11/12 × harga), sehingga tarif efektifnya tetap <b>11%</b> seperti sebelumnya (PMK 131/2024).</span>}
+            {jenis==="mewah" && <span>Barang <b>mewah</b> (mobil mewah, properti mewah, dll.): sejak 1 Februari 2025 PPN = <b>12% × harga penuh</b>. Bisa ditambah PPnBM tersendiri di luar perhitungan ini.</span>}
+            {jenis==="bebas" && <span>Kebutuhan pokok (beras, daging, ikan, telur, sayur, susu segar) serta jasa pendidikan, kesehatan, dan angkutan umum <b>bebas PPN (0%)</b>.</span>}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="result">
+          <div className="lbl">PPN-nya</div>
+          <div className="big">{bigOr(harga>0, fmt(ppn))}</div>
+          <div className="bar"><div className="fill" style={{width:Math.min(pct,100)+"%"}}></div></div>
+          <div className="legend">
+            <span><span className="dot" style={{background:"#fff"}}></span>Harga dasar {fmt(hargaDasar)}</span>
+            <span><span className="dot" style={{background:"var(--gold)"}}></span>PPN {fmt(ppn)}</span>
+          </div>
+          <div className="splitrow">
+            <div className="c"><div className="k">Harga sebelum PPN</div><div className="v">{fmt(hargaDasar)}</div></div>
+            <div className="c"><div className="k">Total yang dibayar</div><div className="v">{fmt(total)}</div></div>
+          </div>
+        </div>
+
+        <Breakdown>
+          <div className="ttl">Cara perhitungannya</div>
+          <div className="ln"><span>Harga dasar (sebelum PPN)</span><span className="v">{fmt(hargaDasar)}</span></div>
+          {jenis==="bebas" && (
+            <div className="ln indent"><span>Bebas PPN (0%)</span><span className="v">{fmt(0)}</span></div>
+          )}
+          {jenis==="umum" && (<>
+            <div className="ln"><span>DPP = 11/12 × harga dasar</span><span className="v">{fmt(dpp)}</span></div>
+            <div className="ln indent"><span>12% × {fmt(dpp)}</span><span className="v">{fmt(ppn)}</span></div>
+          </>)}
+          {jenis==="mewah" && (<>
+            <div className="ln"><span>DPP (harga penuh)</span><span className="v">{fmt(dpp)}</span></div>
+            <div className="ln indent"><span>12% × {fmt(dpp)}</span><span className="v">{fmt(ppn)}</span></div>
+          </>)}
+          <div className="ln total"><span>Total dibayar</span><span className="v">{fmt(total)}</span></div>
+        </Breakdown>
+      </div>
+    </div>
+  </div>);
+}
+
+// ========================================================
+function App(){
+  const [page,setPage]=useState("home");
+  const back=()=>setPage("home");
+  if(page==="home") return <Home go={setPage}/>;
+  if(page==="karyawan") return <Karyawan back={back}/>;
+  if(page==="bebas") return <Bebas back={back}/>;
+  if(page==="umkm") return <UMKM back={back}/>;
+  if(page==="ppn") return <PPN back={back}/>;
+  return <Home go={setPage}/>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
 </body>
 </html>

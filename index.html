@@ -667,7 +667,8 @@ function Bebas({back}){
   });
   const totalBruto = months.reduce((a,b)=>a+b,0);
   const totalDPP = totalBruto*0.5;
-  const totalTax = progresif(totalDPP).tax;
+  const {tax:totalTax, layers:totalLayers} = progresif(totalDPP);
+  const activeTotalLayers = totalLayers.filter(l=>l.amt>0);
   const totalBersih = totalBruto - totalTax;
   const pctR = totalBruto>0 ? (totalTax/totalBruto*100) : 0;
 
@@ -722,7 +723,18 @@ function Bebas({back}){
           </div>
         </div>
         <Breakdown>
-          <div className="ttl">Rincian pajak per bulan (kumulatif)</div>
+          <div className="ttl">Perhitungan progresif (setahun)</div>
+          <div className="ln"><span>Total bruto setahun</span><span className="v">{fmt(totalBruto)}</span></div>
+          <div className="ln"><span>Dasar kena pajak (50%)</span><span className="v">{fmt(totalDPP)}</span></div>
+          <div className="sectlbl" style={{margin:"14px 0 2px"}}>Lapisan Pajak Pasal 17</div>
+          {activeTotalLayers.length===0
+            ? <div className="ln indent"><span>Belum kena pajak</span><span className="v">{fmt(0)}</span></div>
+            : activeTotalLayers.map((l,i)=>(
+              <div className="ln indent" key={i}><span>{(l.rate*100)}% × {fmt(l.amt)}</span><span className="v">{fmt(l.tax)}</span></div>
+            ))}
+          <div className="ln total"><span>Total PPh 21 setahun</span><span className="v">{fmt(totalTax)}</span></div>
+
+          <div className="ttl" style={{marginTop:18}}>Rincian pajak per bulan (kumulatif)</div>
           {rows.map((r,i)=>(
             <div className="ln" key={i}>
               <span>{r.bulan} — DPP kum. {fmt(r.cumDPP)}</span>
